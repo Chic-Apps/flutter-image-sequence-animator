@@ -1,15 +1,7 @@
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// © Cosmos Software | Ali Yigit Bireroglu                                                                                                           /
-// All material used in the making of this code, project, program, application, software et cetera (the "Intellectual Property")                     /
-// belongs completely and solely to Ali Yigit Bireroglu. This includes but is not limited to the source code, the multimedia and                     /
-// other asset files. If you were granted this Intellectual Property for personal use, you are obligated to include this copyright                   /
-// text at all times.                                                                                                                                /
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//@formatter:off
-
 import 'package:flutter/material.dart';
 
-typedef ImageSequenceProcessCallback = void Function(ImageSequenceAnimatorState _imageSequenceAnimator);
+typedef ImageSequenceProcessCallback = void Function(
+    ImageSequenceAnimatorState _imageSequenceAnimator);
 
 class ImageSequenceAnimator extends StatefulWidget {
   ///The folder of your image sequence relative to your assets. For example, if you add your image sequence to
@@ -70,23 +62,23 @@ class ImageSequenceAnimator extends StatefulWidget {
   final ImageSequenceProcessCallback onFinishPlaying;
 
   const ImageSequenceAnimator(
-    this.folderName,
-    this.fileName,
-    this.suffixStart,
-    this.suffixCount,
-    this.fileFormat,
-    this.frameCount, {
-    Key key,
-    this.fps: 60,
-    this.isLooping: false,
-    this.isBoomerang: false,
-    this.isAutoPlay: true,
-    this.color: Colors.white,
-    this.onReadyToPlay,
-    this.onStartPlaying,
-    this.onPlaying,
-    this.onFinishPlaying,
-  }) : super(key: key);
+      this.folderName,
+      this.fileName,
+      this.suffixStart,
+      this.suffixCount,
+      this.fileFormat,
+      this.frameCount, {
+        Key key,
+        this.fps: 60,
+        this.isLooping: false,
+        this.isBoomerang: false,
+        this.isAutoPlay: true,
+        this.color: Colors.white,
+        this.onReadyToPlay,
+        this.onStartPlaying,
+        this.onPlaying,
+        this.onFinishPlaying,
+      }) : super(key: key);
 
   @override
   ImageSequenceAnimatorState createState() {
@@ -110,14 +102,16 @@ class ImageSequenceAnimator extends StatefulWidget {
   }
 }
 
-class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with SingleTickerProviderStateMixin {
+class ImageSequenceAnimatorState extends State<ImageSequenceAnimator>
+    with SingleTickerProviderStateMixin {
   final String folderName;
   final String fileName;
   final int suffixStart;
   final int suffixCount;
   String fileFormat;
   final double frameCount;
-  final double fps;
+  double fps;
+
   int get fpsInMilliseconds => (1.0 / fps * 1000.0).floor();
 
   bool isLooping;
@@ -146,22 +140,22 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   double get currentTime => animationController.value * fpsInMilliseconds;
 
   ImageSequenceAnimatorState(
-    this.folderName,
-    this.fileName,
-    this.suffixStart,
-    this.suffixCount,
-    this.fileFormat,
-    this.frameCount,
-    this.fps,
-    this.isLooping,
-    this.isBoomerang,
-    this.isAutoPlay,
-    this.color,
-    this.onReadyToPlay,
-    this.onStartPlaying,
-    this.onPlaying,
-    this.onFinishPlaying,
-  );
+      this.folderName,
+      this.fileName,
+      this.suffixStart,
+      this.suffixCount,
+      this.fileFormat,
+      this.frameCount,
+      this.fps,
+      this.isLooping,
+      this.isBoomerang,
+      this.isAutoPlay,
+      this.color,
+      this.onReadyToPlay,
+      this.onStartPlaying,
+      this.onPlaying,
+      this.onFinishPlaying,
+      );
 
   void animationListener() {
     changeNotifier.value++;
@@ -238,6 +232,14 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
     }
   }
 
+  void setFps(double fps) {
+    setState(() {
+      this.fps = fps;
+      animationController.duration =
+          Duration(milliseconds: frameCount.ceil() * fpsInMilliseconds);
+    });
+  }
+
   ///Use this function to set the value for [ImageSequenceAnimator.color] at runtime.
   void changeColor(Color color) {
     this.color = color;
@@ -246,7 +248,8 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   }
 
   void play({double from: -1.0}) {
-    if (!animationController.isAnimating && onStartPlaying != null) onStartPlaying(this);
+    if (!animationController.isAnimating && onStartPlaying != null)
+      onStartPlaying(this);
 
     if (from == -1.0)
       animationController.forward();
@@ -255,7 +258,8 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   }
 
   void rewind({double from: -1.0}) {
-    if (!animationController.isAnimating && onStartPlaying != null) onStartPlaying(this);
+    if (!animationController.isAnimating && onStartPlaying != null)
+      onStartPlaying(this);
 
     if (from == -1.0)
       animationController.reverse();
@@ -297,21 +301,28 @@ class ImageSequenceAnimatorState extends State<ImageSequenceAnimator> with Singl
   }
 
   String getDirectory() {
-    return folderName + "/" + fileName + getSuffix((suffixStart + previousFrame).toString()) + "." + fileFormat;
+    return folderName +
+        "/" +
+        fileName +
+        getSuffix((suffixStart + previousFrame).toString()) +
+        "." +
+        fileFormat;
   }
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       builder: (BuildContext context, int change, Widget cachedChild) {
-        if (currentFrame == null || animationController.value.floor() != previousFrame || colorChanged) {
+        if (currentFrame == null ||
+            animationController.value.floor() != previousFrame ||
+            colorChanged) {
           colorChanged = false;
           previousFrame = animationController.value.floor();
           if (previousFrame < frameCount)
             currentFrame = Image.asset(
               getDirectory(),
-              color: color,
               gaplessPlayback: true,
+              fit: BoxFit.contain,
             );
         }
 
